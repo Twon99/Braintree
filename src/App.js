@@ -4,8 +4,10 @@ import './App.css';
 
 function App() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    financialProviderName: '',
+    nameOnCard: '',
+    compensationCode: '',
+    financialProviderCode: '',
     amount: '',
   });
   const [btInstance, setBtInstance] = useState(null);
@@ -45,6 +47,13 @@ function App() {
     });
   };
 
+  const handleCopyName = () => {
+    setFormData({
+      ...formData,
+      nameOnCard: formData.financialProviderName,
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (btInstance) {
@@ -60,16 +69,20 @@ function App() {
             body: JSON.stringify({
               paymentMethodNonce: payload.nonce,
               amount: formData.amount,
+              financialProviderName: formData.financialProviderName,
+              nameOnCard: formData.nameOnCard,
+              compensationCode: formData.compensationCode,
+              financialProviderCode: formData.financialProviderCode,
             })
           })
-            .then(response => response.json())
-            .then(data => {
-              if (data.success) {
-                alert('Payment successful! Transaction ID: ' + data.transactionId);
-              } else {
-                alert('Payment failed: ' + data.error);
-              }
-            });
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert('Payment successful! Transaction ID: ' + data.transactionId);
+            } else {
+              alert('Payment failed: ' + data.error);
+            }
+          });
         }
       });
     }
@@ -81,14 +94,27 @@ function App() {
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>
-            Name:
-            <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+            Financial Provider Name:
+            <input type="text" name="financialProviderName" value={formData.financialProviderName} onChange={handleChange} required />
+          </label>
+          <button type="button" onClick={handleCopyName} className="copy-button">Copy to Name on Card</button>
+        </div>
+        <div className="form-group">
+          <label>
+            Name on Card:
+            <input type="text" name="nameOnCard" value={formData.nameOnCard} onChange={handleChange} required />
           </label>
         </div>
         <div className="form-group">
           <label>
-            Email:
-            <input type="email" name="email" value={formData.email} onChange={handleChange} required />
+            Compensation Code:
+            <input type="text" name="compensationCode" value={formData.compensationCode} onChange={handleChange} required />
+          </label>
+        </div>
+        <div className="form-group">
+          <label>
+            Financial Provider Code:
+            <input type="text" name="financialProviderCode" value={formData.financialProviderCode} onChange={handleChange} required />
           </label>
         </div>
         <div className="form-group">
@@ -98,7 +124,7 @@ function App() {
           </label>
         </div>
         <div ref={dropinContainer} className="dropin-container"></div>
-        <button type="submit">Submit</button>
+        <button type="submit" className="submit-button">Submit</button>
       </form>
     </div>
   );
