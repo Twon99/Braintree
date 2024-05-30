@@ -20,6 +20,7 @@ console.log("BRAINTREE_MERCHANT_ID:", process.env.BRAINTREE_MERCHANT_ID);
 console.log("BRAINTREE_PUBLIC_KEY:", process.env.BRAINTREE_PUBLIC_KEY);
 console.log("BRAINTREE_PRIVATE_KEY:", process.env.BRAINTREE_PRIVATE_KEY);
 
+// Route to generate client token
 app.get('/client_token', (req, res) => {
     gateway.clientToken.generate({}, (err, response) => {
         if (err) {
@@ -30,14 +31,21 @@ app.get('/client_token', (req, res) => {
     });
 });
 
+// Route to process payment with custom fields
 app.post('/checkout', (req, res) => {
-    const { paymentMethodNonce, amount } = req.body;
+    const { paymentMethodNonce, amount, financialProviderName, nameOnCard, compensationCode, financialProviderCode } = req.body;
 
     gateway.transaction.sale({
         amount: amount,
         paymentMethodNonce: paymentMethodNonce,
         options: {
             submitForSettlement: true,
+        },
+        customFields: {
+            financial_provider_name: financialProviderName,
+            name_on_card: nameOnCard,
+            compensation_code: compensationCode,
+            financial_provider_code: financialProviderCode,
         },
     }, (err, result) => {
         if (result.success) {
@@ -48,6 +56,7 @@ app.post('/checkout', (req, res) => {
     });
 });
 
+// Start the server
 app.listen(3001, () => {
     console.log('Server is listening on port 3001');
 });
